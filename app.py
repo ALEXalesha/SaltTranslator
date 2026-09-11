@@ -3,10 +3,13 @@ import re
 from pathlib import Path
 
 os.environ.setdefault("GRADIO_ANALYTICS_ENABLED", "False")
+# Set before import: transformers warns about missing torch (not needed here) and flags NLLB with a
+# Mistral-specific regex warning whose suggested fix would break its tokenization.
+os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
 
 import ctranslate2
 import gradio as gr
-from transformers import AutoTokenizer, logging as hf_logging
+from transformers import AutoTokenizer
 
 from nllb_languages import LANGUAGE_NAMES
 
@@ -37,8 +40,6 @@ MODELS = {
 }
 MODELS = {k: v for k, v in MODELS.items() if (MODELS_DIR / v[0] / "model.bin").exists()}
 
-# transformers shows a Mistral-specific regex warning for this tokenizer; its suggested fix would break NLLB tokenization.
-hf_logging.set_verbosity_error()
 _loaded = {}
 
 

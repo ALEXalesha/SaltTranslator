@@ -29,14 +29,16 @@
       "backend.js",
       "catalog.json",
       "loading.html",
-      "setup.html"
+      "setup.html",
+      "icon.ico"
     ],
     "extraResources": [
       { "from": "../build/runtime.zip", "to": "runtime.zip" },
       { "from": "../build/app", "to": "app" }
     ],
     "win": {
-      "target": ["nsis", "portable"]
+      "target": ["nsis", "portable"],
+      "icon": "icon.ico"
     },
     "nsis": {
       "oneClick": false,

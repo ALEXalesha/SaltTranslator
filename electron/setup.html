@@ -132,13 +132,14 @@
 
   window.tai.onProgress((p) => {
     const now = performance.now();
+    // Speed from bytes that actually came over the network: after a resume, done jumps by what was already on disk.
     if (speed.t && now - speed.t > 1000) {
-      const inst = ((p.done - speed.done) * 1000) / (now - speed.t);
+      const inst = ((p.transferred - speed.done) * 1000) / (now - speed.t);
       speed.rate = speed.rate ? speed.rate * 0.7 + inst * 0.3 : inst;
       speed.t = now;
-      speed.done = p.done;
+      speed.done = p.transferred;
     } else if (!speed.t) {
-      speed = { t: now, done: p.done, rate: 0 };
+      speed = { t: now, done: p.transferred, rate: 0 };
     }
     $('bar').value = p.total ? p.done / p.total : 0;
     if (p.phase === 'verify') {

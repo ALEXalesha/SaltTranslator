@@ -96,7 +96,8 @@ async function launch() {
   const port = await freePort();
   const current = startBackend({
     command: python,
-    args: ['-E', '-s', '-X', 'utf8', path.join(APP_DIR, 'app.py')],
+    // -u: piped stdout is block-buffered, and the error page would show an empty log right when it matters.
+    args: ['-E', '-s', '-u', '-X', 'utf8', path.join(APP_DIR, 'app.py')],
     cwd: APP_DIR,
     port,
     modelsDir: modelsDir(),
@@ -214,6 +215,7 @@ async function start() {
     minWidth: 720,
     minHeight: 520,
     title: 'Translator AI',
+    icon: path.join(__dirname, 'icon.ico'),
     autoHideMenuBar: true,
     backgroundColor: '#101216',
     webPreferences: {
@@ -224,6 +226,9 @@ async function start() {
     },
   });
   guardNavigation(win.webContents);
+  // Gradio registers a beforeunload handler. Without this, Electron silently cancels both closing the
+  // window and our own switch to the error page when Python dies.
+  win.webContents.on('will-prevent-unload', (event) => event.preventDefault());
   win.on('page-title-updated', (e) => e.preventDefault());
   try {
     if (foundModels().length === 0) {

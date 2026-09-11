@@ -182,20 +182,27 @@ async function downloadModel({ model, modelsDir, localAddress, signal, onProgres
   fs.mkdirSync(dir, { recursive: true });
   const total = model.files.reduce((sum, f) => sum + f.size, 0);
   let finished = 0;
+  let transferred = 0;
   let lastReport = 0;
   const report = (current, file, phase, force = false) => {
     const now = Date.now();
     if (!force && now - lastReport < PROGRESS_EVERY_MS) return;
     lastReport = now;
-    onProgress?.({ done: finished + current, total, file, phase });
+    onProgress?.({ done: finished + current, total, transferred, file, phase });
   };
   for (const file of model.files) {
     const dest = path.join(dir, file.name);
     if (!(await alreadyComplete(dest, file, signal))) {
       fs.rmSync(dest, { force: true });
       let current = 0;
+      // A reset reports what is already on disk; only the increments came over the network.
       const onBytes = (n, reset) => {
-        current = reset ? n : current + n;
+        if (reset) {
+          current = n;
+        } else {
+          current += n;
+          transferred += n;
+        }
         report(current, file.name, 'download', reset);
       };
       const onVerify = () => report(file.size, file.name, 'verify', true);

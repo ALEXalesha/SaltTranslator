@@ -142,8 +142,12 @@ def test_model_is_called_at_most_once_per_request(t):
 
 
 # Every piece of this text contains letters, so every piece goes through the (fake) model.
-letter_word = st.text(alphabet="abcdefжзйкé漢字かな", min_size=1, max_size=12)
-wordy_sentence = st.lists(st.tuples(letter_word, separator), min_size=1, max_size=30).map(
+# Two ways a letterless piece could appear, both correct behaviour that would break this test's premise:
+# a free-standing " — ", and a word longer than MAX split by characters, leaving "。" on its own.
+# So separators stay glued to a word, and a word plus its punctuation stays under MAX tokens.
+letter_word = st.text(alphabet="abcdefжзйкé漢字かな", min_size=1, max_size=MAX - 2)
+glued_separator = st.sampled_from([" ", "  ", ", ", "; ", ": ", ". ", "! ", "? ", "... ", "。", "，", "、", "！", "\t"])
+wordy_sentence = st.lists(st.tuples(letter_word, glued_separator), min_size=1, max_size=30).map(
     lambda ps: "".join(w + s for w, s in ps)
 )
 wordy_text = st.lists(st.one_of(wordy_sentence, st.just("")), max_size=8).map("\n".join)

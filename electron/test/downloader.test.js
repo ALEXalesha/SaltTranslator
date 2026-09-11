@@ -20,6 +20,8 @@ function serve(handler) {
     hits.push({ url: req.url, range: req.headers.range });
     handler(req, res, hits.length);
   });
+  // unref: a failing assertion skips srv.close(), and an open server would otherwise hang the whole test run.
+  server.unref();
   return new Promise((resolve) => {
     server.listen(0, '127.0.0.1', () => {
       resolve({
@@ -181,6 +183,20 @@ test('downloadModel writes every file into models/<folder> and reports progress'
   const last = progress.at(-1);
   assert.strictEqual(last.done, last.total);
   assert.strictEqual(last.total, 2 * DATA.length);
+  await srv.close();
+});
+
+test('progress counts bytes fetched now apart from bytes already on disk', async () => {
+  const srv = await serve((req, res) => send(req, res));
+  const dir = tmp();
+  fs.mkdirSync(path.join(dir, 'm'));
+  fs.writeFileSync(path.join(dir, 'm', 'model.bin.part'), DATA.subarray(0, 100_000));
+  const progress = [];
+  await downloadModel({ model: catalogModel(srv.url), modelsDir: dir, onProgress: (p) => progress.push(p) });
+  const last = progress.at(-1);
+  assert.strictEqual(last.done, 2 * DATA.length);
+  assert.strictEqual(last.transferred, 2 * DATA.length - 100_000);
+  assert.ok(progress.every((p, i) => i === 0 || p.transferred >= progress[i - 1].transferred));
   await srv.close();
 });
 

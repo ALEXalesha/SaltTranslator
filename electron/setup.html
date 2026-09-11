@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>Translator AI</title>
+<style>
+  :root { color-scheme: dark; --bg: #101216; --card: #161a20; --line: #262b33; --fg: #e8eaee; --muted: #8b93a1;
+          --accent: #6ea8fe; --ok: #7ee787; --danger: #ff7b72; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 "Segoe UI", system-ui, sans-serif; }
+  main { width: min(760px, 92vw); margin: 40px auto; }
+  h1 { font-size: 24px; font-weight: 600; margin: 0 0 6px; }
+  .lead { color: var(--muted); margin: 0 0 24px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; }
+  h2 { font-size: 15px; font-weight: 600; margin: 0 0 10px; }
+  .path { font-family: Consolas, monospace; font-size: 13px; word-break: break-all; background: #0d1014;
+          border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .ok { color: var(--ok); }
+  .danger { color: var(--danger); }
+  label { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; cursor: pointer; }
+  label.disabled { cursor: default; opacity: 0.55; }
+  input[type=checkbox] { margin-top: 4px; accent-color: var(--accent); }
+  button { font: inherit; padding: 9px 16px; border-radius: 8px; border: 1px solid #2f3540; background: #1a1e25;
+           color: var(--fg); cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #0b1220; font-weight: 600; }
+  button:disabled { opacity: 0.45; cursor: default; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  progress { width: 100%; height: 10px; accent-color: var(--accent); margin: 8px 0 4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Модели для переводчика</h1>
+  <p class="lead">Модели весят несколько гигабайт, поэтому в установщик не входят. Скачай их один раз или укажи папку, где они уже лежат.</p>
+
+  <section>
+    <h2>Папка с моделями</h2>
+    <div class="path" id="dir"></div>
+    <div class="row">
+      <button id="choose">Выбрать другую папку…</button>
+      <button id="open">Открыть в проводнике</button>
+    </div>
+    <p class="muted" id="found"></p>
+  </section>
+
+  <section>
+    <h2>Скачать</h2>
+    <div id="models"></div>
+    <label id="vpnRow" hidden><input type="checkbox" id="vpn"><span>Качать мимо VPN, через <b id="iface"></b>. Помогает, если VPN режет скорость.</span></label>
+    <p class="muted" id="space"></p>
+    <div id="progressBox" hidden>
+      <progress id="bar" max="1" value="0"></progress>
+      <div class="muted" id="progressText"></div>
+    </div>
+    <p class="danger" id="error" hidden></p>
+    <div class="row">
+      <button class="primary" id="download">Скачать</button>
+      <button id="cancel" hidden>Отмена</button>
+    </div>
+  </section>
+
+  <div class="row">
+    <button class="primary" id="launch" disabled>Запустить переводчик</button>
+  </div>
+</main>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const gb = (n) => (n / 1e9).toFixed(1).replace('.', ',') + ' ГБ';
+  let current = null;
+  let busy = false;
+  let speed = { t: 0, done: 0, rate: 0 };
+
+  function selected() {
+    return [...document.querySelectorAll('#models input:checked:not(:disabled)')].map((i) => i.value);
+  }
+
+  function neededBytes() {
+    return current.models.filter((m) => selected().includes(m.id)).reduce((s, m) => s + m.size, 0);
+  }
+
+  function refreshButtons() {
+    const need = neededBytes();
+    const enough = current.freeBytes == null || need === 0 || current.freeBytes > need * 1.05;
+    $('space').textContent = current.freeBytes == null ? '' :
+      `Свободно на диске: ${gb(current.freeBytes)}` + (need ? `, нужно ${gb(need)}.` : '.');
+    $('space').className = enough ? 'muted' : 'danger';
+    $('download').disabled = busy || need === 0 || !enough;
+    $('launch').disabled = busy || current.found.length === 0;
+    $('choose').disabled = busy;
+  }
+
+  function render(state) {
+    current = state;
+    $('dir').textContent = state.modelsDir;
+    $('found').innerHTML = state.found.length
+      ? `<span class="ok">Найдено: ${state.found.join(', ')}.</span>`
+      : 'В этой папке моделей пока нет.';
+    const box = $('models');
+    box.textContent = '';
+    for (const m of state.models) {
+      const have = state.found.includes(m.label);
+      const row = document.createElement('label');
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.value = m.id;
+      const text = document.createElement('span');
+      if (have) {
+        input.disabled = true;
+        input.checked = true;
+        row.className = 'disabled';
+        text.textContent = `${m.label} — уже есть`;
+      } else if (!m.downloadable) {
+        input.disabled = true;
+        row.className = 'disabled';
+        text.textContent = `${m.label} — скачать нельзя: готовой версии нет в сети. Если она у тебя есть, выбери папку, где лежит ${m.folder}.`;
+      } else {
+        input.checked = true;
+        text.textContent = `${m.label} — ${gb(m.size)}`;
+      }
+      input.onchange = refreshButtons;
+      row.append(input, text);
+      box.append(row);
+    }
+    if (state.network) {
+      $('vpnRow').hidden = false;
+      $('iface').textContent = `${state.network.name} (${state.network.address})`;
+    }
+    refreshButtons();
+  }
+
+  window.tai.onProgress((p) => {
+    const now = performance.now();
+    if (speed.t && now - speed.t > 1000) {
+      const inst = ((p.done - speed.done) * 1000) / (now - speed.t);
+      speed.rate = speed.rate ? speed.rate * 0.7 + inst * 0.3 : inst;
+      speed.t = now;
+      speed.done = p.done;
+    } else if (!speed.t) {
+      speed = { t: now, done: p.done, rate: 0 };
+    }
+    $('bar').value = p.total ? p.done / p.total : 0;
+    if (p.phase === 'verify') {
+      $('progressText').textContent = `${p.model}: проверяю контрольную сумму ${p.file}…`;
+      return;
+    }
+    const left = speed.rate > 0 ? Math.ceil((p.total - p.done) / speed.rate / 60) : null;
+    $('progressText').textContent = `${p.model}: ${gb(p.done)} из ${gb(p.total)}` +
+      (speed.rate > 0 ? ` · ${(speed.rate / 1e6).toFixed(1).replace('.', ',')} МБ/с · осталось около ${left} мин` : '');
+  });
+
+  $('choose').onclick = async () => render(await window.tai.chooseFolder());
+  $('open').onclick = () => window.tai.openModelsFolder();
+  $('launch').onclick = () => window.tai.launch();
+  $('cancel').onclick = () => window.tai.cancel();
+  $('download').onclick = async () => {
+    busy = true;
+    speed = { t: 0, done: 0, rate: 0 };
+    $('error').hidden = true;
+    $('progressBox').hidden = false;
+    $('cancel').hidden = false;
+    refreshButtons();
+    const res = await window.tai.download(selected(), $('vpn').checked);
+    busy = false;
+    $('cancel').hidden = true;
+    render(await window.tai.state());
+    if (res.ok) {
+      $('progressText').textContent = 'Готово.';
+      window.tai.launch();
+    } else {
+      $('error').hidden = false;
+      $('error').textContent = res.cancelled
+        ? 'Загрузка остановлена. Если нажать «Скачать» снова, она продолжится с того же места.'
+        : `Не получилось скачать: ${res.error}. Нажми «Скачать» ещё раз, загрузка продолжится с места обрыва.`;
+    }
+  };
+
+  window.tai.state().then(render);
+</script>
+</body>
+</html>

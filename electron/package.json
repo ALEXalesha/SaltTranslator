@@ -1,0 +1,52 @@
+{
+  "name": "translator-ai",
+  "productName": "Translator AI",
+  "version": "1.0.0",
+  "description": "Локальный переводчик на NLLB-200",
+  "author": "ALEXaloysha",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.js",
+    "dist": "electron-builder --win nsis portable"
+  },
+  "devDependencies": {
+    "electron": "43.0.0",
+    "electron-builder": "24.13.3"
+  },
+  "build": {
+    "appId": "ru.alexaloysha.translatorai",
+    "productName": "Translator AI",
+    "directories": {
+      "output": "../dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "paths.js",
+      "downloader.js",
+      "backend.js",
+      "catalog.json",
+      "loading.html",
+      "setup.html"
+    ],
+    "extraResources": [
+      { "from": "../build/runtime.zip", "to": "runtime.zip" },
+      { "from": "../build/app", "to": "app" }
+    ],
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "artifactName": "Translator AI Setup ${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Translator AI ${version}.${ext}"
+    }
+  }
+}

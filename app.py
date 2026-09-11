@@ -109,7 +109,17 @@ with gr.Blocks(title="Переводчик NLLB") as demo:
         model.change(pick_model, model, [src, tgt, result])
         swap_btn.click(core.swap, [src, tgt, text, result], [src, tgt, text, result])
 
-if __name__ == "__main__":
-    if MODELS:
+def preload():
+    # Loading up front makes the first translation fast; a broken model must not keep the UI from starting,
+    # the user can still switch to another model and will see the error when translating.
+    if not MODELS:
+        return
+    try:
         load(next(iter(MODELS)))
+    except Exception as e:
+        print(f"Не удалось заранее загрузить модель: {e}", flush=True)
+
+
+if __name__ == "__main__":
+    preload()
     demo.launch(server_name="127.0.0.1", inbrowser=not os.environ.get("TRANSLATOR_EMBEDDED"))

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>Translator AI</title>
+<style>
+  :root { color-scheme: dark; --bg: #101216; --fg: #e8eaee; --muted: #8b93a1; --accent: #6ea8fe; --danger: #ff7b72; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--fg);
+         font: 15px/1.5 "Segoe UI", system-ui, sans-serif; }
+  main { width: min(720px, 90vw); text-align: center; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 18px; }
+  .spinner { width: 40px; height: 40px; margin: 0 auto 18px; border-radius: 50%;
+             border: 3px solid #2a2f38; border-top-color: var(--accent); animation: spin 0.9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #status { color: var(--muted); }
+  #error { text-align: left; }
+  #error p { color: var(--danger); font-weight: 600; }
+  pre { max-height: 45vh; overflow: auto; background: #0a0c0f; border: 1px solid #262b33; border-radius: 8px;
+        padding: 12px; font: 12px/1.45 Consolas, monospace; white-space: pre-wrap; color: #c9d1d9; }
+  button { font: inherit; padding: 9px 16px; margin-right: 8px; border-radius: 8px; border: 1px solid #2f3540;
+           background: #1a1e25; color: var(--fg); cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #0b1220; font-weight: 600; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Translator AI</h1>
+  <section id="busy">
+    <div class="spinner"></div>
+    <div id="status">Запуск…</div>
+  </section>
+  <section id="error" hidden>
+    <p id="message"></p>
+    <pre id="log"></pre>
+    <button class="primary" id="restart">Перезапустить</button>
+    <button id="setup">Выбрать папку с моделями</button>
+  </section>
+</main>
+<script>
+  const $ = (id) => document.getElementById(id);
+  window.tai.onStatus((text) => { $('status').textContent = text; });
+  window.tai.onError(({ message, log }) => {
+    $('busy').hidden = true;
+    $('error').hidden = false;
+    $('message').textContent = message;
+    $('log').textContent = log || 'Вывода нет.';
+    $('log').hidden = !log;
+  });
+  $('restart').onclick = () => { $('error').hidden = true; $('busy').hidden = false; window.tai.restart(); };
+  $('setup').onclick = () => window.tai.openSetup();
+</script>
+</body>
+</html>

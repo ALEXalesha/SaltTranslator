@@ -1,0 +1,26 @@
+{
+  "models": [
+    {
+      "id": "nllb",
+      "label": "NLLB-200 · 200 языков",
+      "folder": "nllb-ct2-int8",
+      "downloadable": true,
+      "baseUrl": "https://huggingface.co/OpenNMT/nllb-200-3.3B-ct2-int8/resolve/28d998cc8548ad62f4f98cf8860928c3af99b97b",
+      "files": [
+        { "name": "config.json", "size": 1071 },
+        { "name": "generation_config.json", "size": 189 },
+        { "name": "shared_vocabulary.json", "size": 5921176 },
+        { "name": "special_tokens_map.json", "size": 3548 },
+        { "name": "tokenizer_config.json", "size": 564 },
+        { "name": "tokenizer.json", "size": 17331176, "sha256": "e316b82de11d0f951f370943b3c438311629547285129b0b81dadabd01bca665" },
+        { "name": "model.bin", "size": 3356047962, "sha256": "b7540c4e19aa2a5079c89241ffccb49711705ca8b1d255cea00c3216dc7d5165" }
+      ]
+    },
+    {
+      "id": "salt",
+      "label": "SALT · языки Уганды",
+      "folder": "ct2-int8",
+      "downloadable": false
+    }
+  ]
+}

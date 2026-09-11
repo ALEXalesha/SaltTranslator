@@ -16,18 +16,20 @@ TOKENIZER_FILES = [
 BASE_ARCH = ["M2M100ForConditionalGeneration"]
 
 
-def patch_architecture():
+def patch_architecture(hf_dir):
     # config.json names Sunbird's training subclass; the weights are plain M2M100, which the converter knows.
-    cfg_path = HF_DIR / "config.json"
+    cfg_path = hf_dir / "config.json"
     cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
-    if cfg["architectures"] != BASE_ARCH:
-        shutil.copy(cfg_path, HF_DIR / "config.original.json")
+    if cfg.get("architectures") != BASE_ARCH:
+        backup = hf_dir / "config.original.json"
+        if not backup.exists():
+            shutil.copy(cfg_path, backup)
         cfg["architectures"] = BASE_ARCH
         cfg_path.write_text(json.dumps(cfg, indent=2), encoding="utf-8")
 
 
 def main():
-    patch_architecture()
+    patch_architecture(HF_DIR)
     converter = ctranslate2.converters.TransformersConverter(
         str(HF_DIR),
         copy_files=TOKENIZER_FILES,

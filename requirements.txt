@@ -1,0 +1,5 @@
+ctranslate2==4.8.2
+transformers==5.17.0
+sentencepiece==0.2.2
+protobuf==7.36.1
+gradio==6.27.0

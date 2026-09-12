@@ -48,7 +48,8 @@
       "artifactName": "Translator AI Setup ${version}.${ext}"
     },
     "portable": {
-      "artifactName": "Translator AI ${version}.${ext}"
+      "artifactName": "Translator AI ${version}.${ext}",
+      "unpackDirName": true
     }
   }
 }

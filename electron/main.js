@@ -85,8 +85,15 @@ async function ensureRuntime() {
 
 async function showError(error) {
   if (!win || win.isDestroyed()) return;
-  await win.loadFile('loading.html');
-  send('error', { message: error.message || String(error), log: backend ? backend.log() : '' });
+  const message = error.message || String(error);
+  const log = backend ? backend.log() : '';
+  try {
+    await win.loadFile('loading.html');
+    send('error', { message, log });
+  } catch (e) {
+    // If even our own page cannot load, the user must still learn what happened.
+    dialog.showErrorBox('Translator AI', `${message}\n\n${log.split('\n').slice(-15).join('\n')}`);
+  }
 }
 
 async function launch() {
@@ -104,7 +111,7 @@ async function launch() {
   });
   backend = current;
   current.proc.on('exit', (code) => {
-    if (!quitting && backend === current) showError(new Error(`Переводчик неожиданно завершился (код ${code}).`));
+    if (!quitting && backend === current) showError(new Error(`Переводчик неожиданно завершился (код ${code}).`)).catch(() => {});
   });
   await waitReady({ port, exitCode: () => current.exitCode(), timeoutMs: 180_000, intervalMs: 300 });
   if (backend === current) await win.loadURL(`http://127.0.0.1:${port}/`);

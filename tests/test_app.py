@@ -6,18 +6,26 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 
+def app_env(models_dir):
+    # UTF-8, как у самого приложения: Electron запускает Python с -X utf8. Без
+    # этого дочерний процесс пишет в кодировке системы, и на английском раннере
+    # CI (cp1252) русское сообщение об ошибке падало с UnicodeEncodeError раньше,
+    # чем тест успевал его проверить.
+    return dict(os.environ, TRANSLATOR_MODELS_DIR=str(models_dir), TRANSFORMERS_VERBOSITY="error",
+                PYTHONIOENCODING="utf-8")
+
+
 def import_app(models_dir):
-    env = dict(os.environ, TRANSLATOR_MODELS_DIR=str(models_dir), TRANSFORMERS_VERBOSITY="error")
     return subprocess.run(
         [sys.executable, "-c", "import app; print('models', list(app.MODELS))"],
-        cwd=ROOT, env=env, capture_output=True, text=True, timeout=300,
+        cwd=ROOT, env=app_env(models_dir), capture_output=True, encoding="utf-8", timeout=300,
     )
 
 
 def run_in_app(models_dir, code):
-    env = dict(os.environ, TRANSLATOR_MODELS_DIR=str(models_dir), TRANSFORMERS_VERBOSITY="error")
     return subprocess.run(
-        [sys.executable, "-c", code], cwd=ROOT, env=env, capture_output=True, text=True, timeout=300
+        [sys.executable, "-c", code], cwd=ROOT, env=app_env(models_dir), capture_output=True,
+        encoding="utf-8", timeout=300,
     )
 
 

@@ -1,0 +1,51 @@
+# Проверки на каждый пуш.
+#
+# Моделей на раннере нет и не будет: веса весят 6,6 ГБ и распространяются по
+# CC BY-NC 4.0. Поэтому здесь быстрые тесты - ядро перевода со свойствами на
+# Hypothesis и приложение без моделей, с недокачанной и с битой моделью.
+# Тесты на настоящей NLLB (pytest -m slow) гоняются локально перед выпуском.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  python:
+    name: Python - ядро и приложение
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Зависимости
+        run: pip install -r requirements-dev.txt
+      - name: Тесты и свойства
+        run: python -m pytest -q
+
+  electron:
+    name: Electron - загрузчик, пути, запуск Python
+    runs-on: windows-latest
+    timeout-minutes: 10
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+    defaults:
+      run:
+        working-directory: electron
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: electron/package-lock.json
+      - name: Зависимости
+        run: npm ci
+      - name: Тесты
+        run: npm test

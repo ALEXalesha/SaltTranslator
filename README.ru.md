@@ -1,4 +1,19 @@
-# translator_ai
+<div align="center">
+
+# Translator AI
+
+**Локальный переводчик на нейросети NLLB-3.3B: без интернета, на процессоре, 202 языка плюс языки Уганды. Код под MIT, модели — CC BY-NC 4.0 и в репозиторий не входят.**
+
+[Скачать для Windows](https://github.com/ALEXalesha/SaltTranslator/releases/latest) &nbsp;·&nbsp; [English version of this file](README.md)
+
+[![CI](https://github.com/ALEXalesha/SaltTranslator/actions/workflows/ci.yml/badge.svg)](https://github.com/ALEXalesha/SaltTranslator/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/ALEXalesha/SaltTranslator?color=16a34a)](https://github.com/ALEXalesha/SaltTranslator/releases/latest)
+[![Code: MIT](https://img.shields.io/badge/code-MIT-blue)](LICENSE)
+[![Models: CC BY-NC 4.0](https://img.shields.io/badge/models-CC%20BY--NC%204.0-orange)](#лицензии)
+
+<img src="docs/screenshots/window.png" width="860" alt="Перевод с английского на русский моделью NLLB-200">
+
+</div>
 
 Локальный переводчик на нейросети NLLB-3.3B. Работает без интернета, на процессоре, в своём окне или в браузере.
 
@@ -243,6 +258,38 @@ requirements*.txt   зависимости приложения и тестов
 models/             модели (не в git)
 ```
 
+## Кадры для README собираются программой
+
+`electron/tools/make-screenshots.js` поднимает настоящий бэкенд так же, как
+приложение, вводит текст, жмёт «Перевести» и снимает страницу после настоящего
+перевода моделью, через `capturePage()`: чужое окно в кадр попасть не может.
+Моделей в репозитории нет, поэтому без них скрипт честно падает.
+
+```powershell
+cd electron
+npx electron tools/make-screenshots.js
+```
+
+На кадре видно и ограничение, о котором стоит знать: предложение, разорванное
+переносом строки, переводится двумя кусками («не останавливается на полпути
+через слово»). Это цена сохранения разметки: каждая строка остаётся строкой.
+Длинное предложение без переносов режется программой по токенам и собирается
+обратно без таких швов.
+
 ## Лицензии
 
-Обе модели распространяются по [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/): можно пользоваться и изменять, но не в коммерческих целях.
+**Код** этого репозитория — MIT, файл [LICENSE](LICENSE).
+
+**Модели** — нет. Обе распространяются авторами по
+[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/): пользоваться и
+изменять можно, **в коммерческих целях нельзя**, авторство указывать обязательно.
+
+| Модель | Автор | Карточка |
+|---|---|---|
+| NLLB-200 3.3B, сборка CTranslate2 int8 | Meta AI; конвертация OpenNMT | [OpenNMT/nllb-200-3.3B-ct2-int8](https://huggingface.co/OpenNMT/nllb-200-3.3B-ct2-int8) |
+| SALT (NLLB, дообученный на языках Уганды) | Sunbird AI | [Sunbird/translate-nllb-3.3b-salt](https://huggingface.co/Sunbird/translate-nllb-3.3b-salt) |
+
+Веса моделей **не лежат ни в этом репозитории, ни в релизах**: установщик и
+portable весят около 230 МБ, моделей внутри нет. NLLB-200 скачивается из окна
+программы прямо с Hugging Face, с проверкой SHA-256; SALT человек конвертирует
+сам по инструкции выше. Лицензия MIT на код не меняет условий самих моделей.

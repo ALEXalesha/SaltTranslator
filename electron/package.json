@@ -1,7 +1,7 @@
 {
   "name": "translator-ai",
   "productName": "Translator AI",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Локальный переводчик на NLLB-200",
   "author": "ALEXaloysha",
   "private": true,
@@ -27,6 +27,7 @@
       "paths.js",
       "downloader.js",
       "backend.js",
+      "window-state.js",
       "catalog.json",
       "loading.html",
       "setup.html",

@@ -26,6 +26,8 @@
 
 ## Installing
 
+The window opens where and how large it was closed (since 1.1.0); the saved place is checked against the monitors present, and a window from an unplugged monitor opens centred on the main one.
+
 The installer and the portable exe weigh about 230 MB: Electron and Python with every package are inside, the models are not. On first start a window offers to:
 
 - download NLLB-200 (3.4 GB) from Hugging Face, resuming after a dropped connection and checking SHA-256; a "download around the VPN" box sends the download through the ordinary network card, because Hugging Face over some VPN tunnels crawls at 20-150 KB/s;

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, screen } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const { execFile } = require('child_process');
@@ -6,6 +6,11 @@ const paths = require('./paths');
 const { downloadModel } = require('./downloader');
 const { freePort, waitReady, startBackend, stopBackend } = require('./backend');
 const catalog = require('./catalog.json');
+const WindowState = require('./window-state');
+
+// Размер и место окна между запусками: <данные>\electron\window-state.json.
+const WINDOW_SIZE = { width: 1180, height: 820, minWidth: 720, minHeight: 520 };
+const windowStatePath = () => path.join(app.getPath('userData'), 'window-state.json');
 
 const DATA = paths.dataDir();
 const APP_DIR = app.isPackaged ? path.join(process.resourcesPath, 'app') : path.join(__dirname, '..');
@@ -216,11 +221,17 @@ handle('open-setup', async () => {
 handle('open-models-folder', () => shell.openPath(modelsDir()));
 
 async function start() {
+  // Окно открывается там и такого размера, где его закрыли. Сохранённое проверяется по
+  // нынешним мониторам: монитор отключили - по центру основного, больше экрана - ужать.
+  const primary = screen.getPrimaryDisplay();
+  const areas = [primary, ...screen.getAllDisplays().filter((d) => d.id !== primary.id)].map((d) => d.workArea);
+  const placed = WindowState.restore(WindowState.load(windowStatePath()), areas, WINDOW_SIZE);
   win = new BrowserWindow({
-    width: 1180,
-    height: 820,
-    minWidth: 720,
-    minHeight: 520,
+    ...(placed.x !== undefined ? { x: placed.x, y: placed.y } : {}),
+    width: placed.width,
+    height: placed.height,
+    minWidth: WINDOW_SIZE.minWidth,
+    minHeight: WINDOW_SIZE.minHeight,
     title: 'Translator AI',
     icon: path.join(__dirname, 'icon.ico'),
     autoHideMenuBar: true,
@@ -232,6 +243,12 @@ async function start() {
       nodeIntegration: false,
     },
   });
+  if (placed.maximized) win.maximize();
+  // Запись после перемещения и изменения размера (события приходят в конце жеста) и при
+  // закрытии; через временный файл.
+  const w = win;
+  const remember = () => { if (!w.isDestroyed() && !w.isMinimized()) WindowState.save(windowStatePath(), WindowState.capture(w)); };
+  for (const event of ['resized', 'moved', 'maximize', 'unmaximize', 'close']) w.on(event, remember);
   guardNavigation(win.webContents);
   // Gradio registers a beforeunload handler. Without this, Electron silently cancels both closing the
   // window and our own switch to the error page when Python dies.

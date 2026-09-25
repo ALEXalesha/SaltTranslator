@@ -5,3 +5,4 @@ dist/
 electron/node_modules/
 __pycache__/
 *.pyc
+.claude/

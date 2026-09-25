@@ -187,7 +187,7 @@ powershell -ExecutionPolicy Bypass -File build.ps1
 4. пакует его в `build\runtime.zip`;
 5. гоняет Node-тесты и собирает `dist\` через electron-builder (NSIS и portable).
 
-Electron 43.0.0 и electron-builder 24.13.3 те же, что в SyncGlass, так что всё берётся из кешей npm и electron. Сборка занимает около шести минут. Версия берётся из `electron\package.json`.
+Electron 43.0.0 и electron-builder 26.15.3 те же, что в SyncGlass, так что всё берётся из кешей npm и electron (сборщик 26.15.3 с 25.09.2026: у 24.13.3 `npm audit` находил 10 уязвимостей в инструментах сборки, теперь 0). Сборка занимает около шести минут. Версия берётся из `electron\package.json`.
 
 Где лежат данные:
 

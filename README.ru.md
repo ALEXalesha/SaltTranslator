@@ -15,6 +15,9 @@
 
 </div>
 
+[![Built with Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-D97757?logo=claude&logoColor=white)](https://claude.com/claude-code)
+Код, тесты и документация этого проекта написаны Claude (Anthropic) в Claude Code. Идеи, проверка и решения - Алексей.
+
 Локальный переводчик на нейросети NLLB-3.3B. Работает без интернета, на процессоре, в своём окне или в браузере.
 
 Внутри две модели, между ними переключатель в интерфейсе:

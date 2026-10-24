@@ -6,17 +6,13 @@
 
 [Download for Windows](https://github.com/ALEXalesha/SaltTranslator/releases/latest) &nbsp;·&nbsp; [Русская версия этого файла](README.ru.md)
 
-[![CI](https://github.com/ALEXalesha/SaltTranslator/actions/workflows/ci.yml/badge.svg)](https://github.com/ALEXalesha/SaltTranslator/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/ALEXalesha/SaltTranslator?color=16a34a)](https://github.com/ALEXalesha/SaltTranslator/releases/latest)
-[![Code: MIT](https://img.shields.io/badge/code-MIT-blue)](LICENSE)
-[![Models: CC BY-NC 4.0](https://img.shields.io/badge/models-CC%20BY--NC%204.0-orange)](#models-and-licences)
+[![Status](https://img.shields.io/badge/status-stable-brightgreen)](#) [![Release](https://img.shields.io/github/v/release/ALEXalesha/SaltTranslator)](https://github.com/ALEXalesha/SaltTranslator/releases/latest) [![CI](https://github.com/ALEXalesha/SaltTranslator/actions/workflows/ci.yml/badge.svg)](https://github.com/ALEXalesha/SaltTranslator/actions/workflows/ci.yml) [![Code: MIT](https://img.shields.io/badge/code-MIT-blue)](LICENSE) [![Models: CC BY-NC 4.0](https://img.shields.io/badge/models-CC%20BY--NC%204.0-orange)](#models-and-licences) [![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)](https://www.python.org/) [![Gradio](https://img.shields.io/badge/Gradio-F97316?logo=gradio&logoColor=white)](https://www.gradio.app/) [![Electron](https://img.shields.io/badge/Electron-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/) [![Built with Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-D97757?logo=claude&logoColor=white)](https://claude.com/claude-code)
+
+Code, tests and docs are written by Claude (Anthropic) in Claude Code. Ideas, testing and decisions - Alexey.
 
 <img src="docs/screenshots/window.png" width="860" alt="English to Russian with NLLB-200">
 
 </div>
-
-[![Built with Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-D97757?logo=claude&logoColor=white)](https://claude.com/claude-code)
-Code, tests and docs are written by Claude (Anthropic) in Claude Code. Ideas, testing and decisions - Alexey.
 
 > **The interface is in Russian**, and so is the long write-up, [README.ru.md](README.ru.md), which this file summarises. «Модель» is the model, «Из» and «В» are the source and target languages, «Перевести» translates.
 

@@ -1,12 +1,14 @@
 <div align="center">
 
+<img src="electron/icon.png" width="96" alt="">
+
 # Translator AI
 
-**Локальный переводчик на нейросети NLLB-3.3B: без интернета, на процессоре, 202 языка плюс языки Уганды. Код под MIT, модели — CC BY-NC 4.0 и в репозиторий не входят.**
+**Локальный переводчик на нейросети NLLB-3.3B: без интернета, на процессоре, 202 языка плюс языки Уганды. Код под MIT, модели - CC BY-NC 4.0 и в репозиторий не входят.**
 
 [Скачать для Windows](https://github.com/ALEXalesha/SaltTranslator/releases/latest) &nbsp;·&nbsp; [English version of this file](README.md)
 
-[![Status](https://img.shields.io/badge/status-stable-brightgreen)](#) [![Release](https://img.shields.io/github/v/release/ALEXalesha/SaltTranslator)](https://github.com/ALEXalesha/SaltTranslator/releases/latest) [![CI](https://github.com/ALEXalesha/SaltTranslator/actions/workflows/ci.yml/badge.svg)](https://github.com/ALEXalesha/SaltTranslator/actions/workflows/ci.yml) [![Code: MIT](https://img.shields.io/badge/code-MIT-blue)](LICENSE) [![Models: CC BY-NC 4.0](https://img.shields.io/badge/models-CC%20BY--NC%204.0-orange)](#лицензии) [![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)](https://www.python.org/) [![Gradio](https://img.shields.io/badge/Gradio-F97316?logo=gradio&logoColor=white)](https://www.gradio.app/) [![Electron](https://img.shields.io/badge/Electron-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/) [![Built with Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-D97757?logo=claude&logoColor=white)](https://claude.com/claude-code)
+[![Status](https://img.shields.io/badge/status-stable-brightgreen)](#) [![Release](https://img.shields.io/github/v/release/ALEXalesha/SaltTranslator)](https://github.com/ALEXalesha/SaltTranslator/releases/latest) [![CI](https://github.com/ALEXalesha/SaltTranslator/actions/workflows/ci.yml/badge.svg)](https://github.com/ALEXalesha/SaltTranslator/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE) [![Code: MIT](https://img.shields.io/badge/code-MIT-blue)](LICENSE) [![Models: CC BY-NC 4.0](https://img.shields.io/badge/models-CC%20BY--NC%204.0-orange)](#лицензии) [![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)](https://www.python.org/) [![Gradio](https://img.shields.io/badge/Gradio-F97316?logo=gradio&logoColor=white)](https://www.gradio.app/) [![Electron](https://img.shields.io/badge/Electron-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/) [![Built with Claude Code](https://img.shields.io/badge/Built_with-Claude_Code-D97757?logo=claude&logoColor=white)](https://claude.com/claude-code)
 
 Код, тесты и документация этого проекта написаны Claude (Anthropic) в Claude Code. Идеи, проверка и решения - Алексей.
 
@@ -27,8 +29,8 @@
 
 После `build.ps1` в папке `dist/` лежат два файла (в git их нет):
 
-- `Translator AI Setup 1.1.0.exe` — установщик с ярлыками на рабочем столе и в «Пуске»;
-- `Translator AI 1.1.0.exe` — portable: ничего не ставит и хранит всё в папке `Translator AI Data` рядом с собой.
+- `Translator AI Setup 1.1.0.exe` - установщик с ярлыками на рабочем столе и в «Пуске»;
+- `Translator AI 1.1.0.exe` - portable: ничего не ставит и хранит всё в папке `Translator AI Data` рядом с собой.
 
 Оба весят около 230 МБ: внутри Electron и Python со всеми пакетами, но без моделей. Модели на 6,6 ГБ в установщик не влезают, поэтому при первом запуске открывается окно, где можно:
 
@@ -45,7 +47,7 @@ SALT скачать нельзя: её готовой int8-версии в се�
 run.bat
 ```
 
-Откроется браузер. Первая загрузка модели занимает секунд 10–20. SALT грузится только когда её выбрали в переключателе.
+Откроется браузер. Первая загрузка модели занимает секунд 10-20. SALT грузится только когда её выбрали в переключателе.
 
 Текст режется на предложения, а длинные предложения ещё и на куски до 120 токенов: на 200 токенах NLLB обрывает перевод на полуслове, а к тысяче начинает повторять одно слово. Куски без букв («...», «3.14», эмодзи) идут мимо модели, иначе она дописывает к ним выдуманные слова. Пустые строки, отступы и абзацы сохраняются, в китайском и японском предложения склеиваются без пробелов. Кнопка `⇄` меняет языки местами, а тексты только если перевод уже есть. В списке языков можно искать, начав печатать название (`Rus`, `Turk`).
 
@@ -145,7 +147,7 @@ uv pip install --python .venv\Scripts\python.exe torch --index-url https://downl
 
 - **int8 на GPU** падает с `CUBLAS_STATUS_NOT_SUPPORTED`, как только в пакете больше одного предложения или фраза длиннее примерно 16 токенов (около 10 слов). Короткие фразы проходят за 0,2 с, но на реальном тексте это бесполезно.
 - **float16 на GPU** работает, но модель занимает 7,7 из 8 ГБ, Windows вытесняет её в общую память, и одна фраза идёт 17 секунд.
-- **int8 на CPU** стабилен: несколько коротких фраз за 2–3 секунды, одна очень длинная (60 токенов) около 13 секунд.
+- **int8 на CPU** стабилен: несколько коротких фраз за 2-3 секунды, одна очень длинная (60 токенов) около 13 секунд.
 
 Когда выйдет ctranslate2 под CUDA 12.8+, стоит проверить GPU заново.
 
@@ -156,8 +158,8 @@ uv pip install --python .venv\Scripts\python.exe torch --index-url https://downl
 
 В начале `app.py`:
 
-- `THREADS` — число потоков, по умолчанию половина логических ядер. На 16-поточном процессоре 8 потоков оказались на 8% быстрее, чем 16.
-- `BEAM` — ширина поиска, по умолчанию 5, как у Sunbird. Замеры на длинной фразе:
+- `THREADS` - число потоков, по умолчанию половина логических ядер. На 16-поточном процессоре 8 потоков оказались на 8% быстрее, чем 16.
+- `BEAM` - ширина поиска, по умолчанию 5, как у Sunbird. Замеры на длинной фразе:
 
 | BEAM | Время | Качество |
 |---|---|---|
@@ -165,7 +167,7 @@ uv pip install --python .venv\Scripts\python.exe torch --index-url https://downl
 | 2 | 10,3 с | почти то же самое |
 | 1 | 8,8 с | начинает терять слова |
 
-- `MAX_INPUT_TOKENS` и `MAX_OUTPUT_TOKENS` — размер куска текста и предел перевода. Поднимать первый выше 150 не стоит, см. про обрыв на 200 токенах выше.
+- `MAX_INPUT_TOKENS` и `MAX_OUTPUT_TOKENS` - размер куска текста и предел перевода. Поднимать первый выше 150 не стоит, см. про обрыв на 200 токенах выше.
 
 </details>
 
@@ -197,7 +199,7 @@ Electron 43.0.0 и electron-builder 26.15.3 те же, что в SyncGlass, та
 
 Внутри: `runtime\` (распакованный Python, пересоздаётся при смене версии), `models\` (папка моделей по умолчанию), `config.json` (путь к выбранной папке моделей) и `electron\` (кеш Chromium). Пути с кириллицей и пробелами проверены.
 
-Окно открывается там и такого размера, где его закрыли (с 1.1.0): сохранённое место проверяется по нынешним мониторам, и окно с отключённого монитора встаёт по центру основного. Правило — тот же модуль `electron/window-state.js`, что в калькуляторах и Paint Pro.
+Окно открывается там и такого размера, где его закрыли (с 1.1.0): сохранённое место проверяется по нынешним мониторам, и окно с отключённого монитора встаёт по центру основного. Правило - тот же модуль `electron/window-state.js`, что в калькуляторах и Paint Pro.
 
 Как устроен запуск: Electron берёт свободный порт, стартует `python.exe -E -s -u -X utf8 app.py` с переменными `GRADIO_SERVER_PORT`, `TRANSLATOR_MODELS_DIR` и `TRANSLATOR_EMBEDDED`, ждёт ответа и открывает интерфейс в своём окне. Внешние ссылки открываются в браузере. Если Python упал, окно показывает его последний вывод и кнопку «Перезапустить». При выходе всё дерево процессов гасится через `taskkill /T`.
 
@@ -231,7 +233,7 @@ cd electron; npm test                                    # загрузчик, �
 <details>
 <summary><b>Грабли</b></summary>
 
-- **Медленная загрузка через VPN.** Если трафик идёт через VPN-туннель, Hugging Face может отдавать 20–150 КБ/с. В приложении для этого есть галочка «Качать мимо VPN». В командной строке то же самое делает `curl.exe --interface <IP карты Ethernet> ...`, а IP показывает `Get-NetIPAddress -InterfaceAlias Ethernet -AddressFamily IPv4`.
+- **Медленная загрузка через VPN.** Если трафик идёт через VPN-туннель, Hugging Face может отдавать 20-150 КБ/с. В приложении для этого есть галочка «Качать мимо VPN». В командной строке то же самое делает `curl.exe --interface <IP карты Ethernet> ...`, а IP показывает `Get-NetIPAddress -InterfaceAlias Ethernet -AddressFamily IPv4`.
 - **Предупреждение про `fix_mistral_regex`.** transformers ругается на токенизатор NLLB, будто у него неправильный regex. Это ложная тревога от проверки для моделей Mistral: с `fix_mistral_regex=True` токенизация как раз ломается. Предупреждение в `app.py` заглушено.
 - **Порт 7860 занят.** Значит, переводчик из исходников уже запущен в другом окне. Закрой старое окно `run.bat`. Electron-версию это не касается, она берёт свободный порт.
 - **Размер скачиваемого файла 0 байт.** Проводник и `Get-ChildItem` показывают 0 у файла, который ещё открыт на запись. Это не зависшая загрузка.
@@ -279,9 +281,9 @@ npx electron tools/make-screenshots.js
 
 ## Лицензии
 
-**Код** этого репозитория — MIT, файл [LICENSE](LICENSE).
+**Код** этого репозитория - MIT, файл [LICENSE](LICENSE).
 
-**Модели** — нет. Обе распространяются авторами по
+**Модели** - нет. Обе распространяются авторами по
 [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/): пользоваться и
 изменять можно, **в коммерческих целях нельзя**, авторство указывать обязательно.
 

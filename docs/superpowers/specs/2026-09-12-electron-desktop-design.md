@@ -16,10 +16,10 @@
 
 ## Устройство
 
-- `electron/main.js` — жизненный цикл: один экземпляр, папка данных, распаковка Python, выбор моделей, запуск и остановка Python.
-- `electron/downloader.js` — загрузка с Range-докачкой, повторами, sha256 и `localAddress`. Отдельный модуль с тестами на локальном HTTP-сервере.
-- `electron/setup.html` + `preload.js` — окно первого запуска.
-- `build.ps1` — собирает `runtime.zip` (базовый CPython без чужих site-packages + site-packages из `.venv` без dev-пакетов), затем вызывает electron-builder.
+- `electron/main.js` - жизненный цикл: один экземпляр, папка данных, распаковка Python, выбор моделей, запуск и остановка Python.
+- `electron/downloader.js` - загрузка с Range-докачкой, повторами, sha256 и `localAddress`. Отдельный модуль с тестами на локальном HTTP-сервере.
+- `electron/setup.html` + `preload.js` - окно первого запуска.
+- `build.ps1` - собирает `runtime.zip` (базовый CPython без чужих site-packages + site-packages из `.venv` без dev-пакетов), затем вызывает electron-builder.
 
 **Папка данных:** у установленной версии `%LOCALAPPDATA%\Translator AI`, у portable `Translator AI Data` рядом с exe. Внутри лежат `runtime\` (распакованный Python с меткой версии), `models\` (по умолчанию) и `config.json` (путь к моделям).
 
